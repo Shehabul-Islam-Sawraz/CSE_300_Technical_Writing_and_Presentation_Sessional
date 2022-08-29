@@ -1,0 +1,49 @@
+\setbeamercovered{transparent}
+\begin{frame}{Truth Table for JK Flip-flop}
+    \newcolumntype{g}{>{\columncolor{Gray}}c}
+    \begin{table}
+        \centering
+        \begin{tabular}{|g|g|c|c|c|}
+            %\cline{1-4}
+            \hline
+            J & K & $Q_{n-1}$ & $Q_n$ & Mode \\
+            %\cline{1-4}
+            \hline
+            \pause
+            
+            0 & 0 & 0 & 0 & \multirow{2}{*}{Hold/Store} \\
+            \cline{1-4}
+            0 & 0 & 1 & 1 & \\
+            %\cline{1-4}
+            \hline
+            \pause
+            
+            0 & 1 & 0 & 0 & \multirow{2}{*}{Reset} \\
+            \cline{1-4}
+            0 & 1 & 1 & 0 & \\
+            \hline
+            \pause
+            
+            1 & 0 & 0 & 1 & \multirow{2}{*}{Set} \\
+            \cline{1-4}
+            1 & 0 & 1 & 1 & \\
+            \hline
+            \pause
+            
+            1 & 1 & 0 & 1 & \multirow{2}{*}{Toggle} \\
+            \cline{1-4}
+            1 & 1 & 1 & 0 & \\
+            \hline
+
+        \end{tabular}
+        \label{tab:my_label}
+    \end{table}
+    
+\end{frame}
+
+\begin{frame}{Some Trouble Waiting?}
+    \setbeamercovered{transparent}
+    \textbf{When $J=K=1$, an interesting event may occur depending on the clock mechanism.}
+    \pause
+    \textbf{This event is known as \textcolor{blue}{Race Around Condition}}
+\end{frame}

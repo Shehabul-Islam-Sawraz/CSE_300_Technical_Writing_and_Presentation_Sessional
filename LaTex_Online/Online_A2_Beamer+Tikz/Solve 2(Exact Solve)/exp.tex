@@ -1,0 +1,17 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[noline]{algorithm2e}
+
+\SetKwFor{For}{for (}{) $\lbrace$}{$\rbrace$}
+
+\begin{document}
+\begin{tikzpicture}
+
+\begin{algorithm}
+  \For{$i = 0;\ i < 10;\ i = i + 2$}{
+    \draw (0, 0) -- (\i, \i)\;
+  }
+\end{algorithm}
+\end{tikzpicture}
+
+\end{document}

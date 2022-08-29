@@ -1,0 +1,18 @@
+\section{Automaton}
+\begin{frame}{Automaton}
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[->, node distance = 3cm]
+    \node[initial, state] (A) {$q_1$};
+    \node[state](B) [right of = A] {$q_2$};
+    \node[state, accepting] (C) [right of = B] {$q_3$};
+    \path (A) edge [loop above] node{b} (A);
+    \path (A) edge [bend left][above] node {a} (B);
+    \path (B) edge [above] node {a} (C);
+    \path (B) edge [loop above] node {b} (B);
+    \path (C) edge [loop above] node {a,b} (C);
+    \end{tikzpicture}
+    \caption{Automaton}
+\end{figure}
+    
+\end{frame}

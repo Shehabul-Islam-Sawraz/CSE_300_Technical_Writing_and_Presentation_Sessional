@@ -1,0 +1,94 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usepackage{graphics}
+\usepackage{lipsum}
+\usepackage{multicol}
+\usepackage{multirow}
+\usetikzlibrary{shapes.geometric, arrows, automata}
+
+
+%THEME and COLORTHEME
+\usetheme{Madrid}
+%\usetheme{Berkeley}
+%\usetheme{Copenhagen}
+
+% \usecolortheme{beaver}
+% \usecolortheme{beetle}
+%\usecolortheme{seahorse}
+%\usecolortheme{wolverine}
+
+%DEMO TITLEPAGE
+%Information to be included in the title page:
+% \title{Title}
+% \author{Author}
+% \institute{Institute}
+% \date{\today}
+
+%FIXING TITLEPAGE
+\title{LaTeX: Beamer, Tikz, Basics}
+
+\subtitle{An Introduction}
+
+\author[A.R. Anik]{Azizur Rahman Anik}
+%\author{A.~B \and X.~Y}
+
+\institute[BUET]
+{
+  Department of Computer Science and Engineering\\
+  Bangladesh University of Engineering and Technology
+}
+
+\date{\today}
+
+\logo{\includegraphics[height=1cm]{overleaf.png}}
+
+% PLACING ToC AT THE BEGINNING OF EACH SECTION
+% \AtBeginSection[]
+% {
+%   \begin{frame}
+%     \frametitle{Table of Contents}
+%     \tableofcontents[currentsection]
+%   \end{frame}
+% }
+
+
+\begin{document}
+\frame{\titlepage}
+
+
+%TABLE OF CONTENTS
+\begin{frame}
+\frametitle{Table of Contents}
+\tableofcontents
+\end{frame}
+
+\input{automaton}
+\input{blocks}
+\input{effects}
+\input{Figures}
+\input{table}
+\input{tikz}
+\input{Axis}
+\input{flow chart}
+\input{loop in tikz}
+\input{complex nodes}
+\input{itemize}
+
+% \newpage
+
+% \begin{frame}{Shape Drawing}
+%  %draw rectangle
+% \begin{tikzpicture}
+% \draw[fill = blue!50, dashed] (0,0) rectangle (2,2) ; 
+% \end{tikzpicture}
+
+% %draw circle
+% \begin{tikzpicture}
+% \draw[red, thick] (2,2) circle (1);
+% \draw (0,0) parabola (3,3);
+% \end{tikzpicture}   
+% \end{frame}
+
+
+\end{document}

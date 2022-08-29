@@ -1,0 +1,59 @@
+\documentclass{beamer}
+
+% Required packages and libraries
+\usetheme{Madrid}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{circuitikz}
+\usetikzlibrary{calc}
+\usepackage{color, colortbl}
+	
+\definecolor{Gray}{gray}{0.9}
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+
+\title{Flip-flops \& Race-around Problems}
+\author[FT, SIS]{Farhan Tanvir \\ 1805073 \\ Shehabul Islam Sawraz \\ 1805088}
+\institute[BUET]
+{
+  Department of Computer Science and Engineering\\
+  Bangladesh University of Engineering and Technology
+}
+\date{\today}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Checkpoint}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+    \maketitle
+\end{frame}
+
+\begin{frame}{Table of Contents}
+    \tableofcontents
+\end{frame}
+
+\section{Introduction}
+\input{introduction}
+
+\section{Types}
+\input{types}
+
+\section{Truth Table}
+\input{truth-table}
+
+\section{Circuit Diagram}
+\input{circuit}
+
+\section{Misconception}
+\input{fallacy}
+
+\section{Solution}
+\input{solution}
+
+\end{document}

@@ -1,0 +1,1035 @@
+\documentclass{bredelebeamer}
+\usetheme{Madrid}
+% \usecolortheme{seahorse}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.15}
+\usepackage[utf8]{inputenc}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\usepackage{pdfpages}
+\setbeamercovered{transparent}
+\usepackage{graphicx}% http://ctan.org/pkg/graphicx
+\usepackage[footnotesize,hang]{caption} % réduire la taille des légendes des images
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{mathrsfs}
+\usetikzlibrary{arrows}
+% \pagestyle{empty}
+\usepackage{tikz}
+\usepackage{tabularx,booktabs}
+\usepackage{nicematrix}
+\usepackage{smartdiagram}
+\usepackage{amsmath}
+\definecolor{ffqqqq}{rgb}{1,0,0}
+\definecolor{qqqqcc}{rgb}{0,0,0.8}
+\definecolor{qqccqq}{rgb}{0,0.8,0}
+\definecolor{ttqqtt}{rgb}{0.2,0,0.2}
+\usepackage[table,xcdraw]{xcolor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title[]{Smith \& Waterman Algorithm for \linebreak Pairwise Local Alignment}
+
+
+\author[ Kawshik, Imon and Maisha]{Kawshik Kumar Paul(1705043) \linebreak Monirul Haque Imon(1705054) \linebreak Maisha Rahman Mim (1705060)}
+
+% La commande \inst{...} Permet d'afficher l' affiliation de l'intervenant.
+% Si il y a plusieurs intervenants: Marcel Dupont\inst{1}, Roger Durand\inst{2}
+% Il suffit alors d'ajouter un autre institut sur le modèle ci-dessous.
+
+\titlegraphic{\includegraphics[height=1.5cm]{buetlogo}}
+\institute[BUET]{Department of Computer Science and Engineering \\ Bangladesh University of Engieering and Technology \\ Dhaka, Bangladesh }
+
+
+
+\date{\today}
+% Optionnel. La date, généralement celle du jour de la conférence
+
+\subject{Sujet de votre diaporama}
+% C'est utilisé dans les métadonnes du PDF
+
+
+
+% \logo{
+% \includegraphics[scale=0.15]{buetlogo.png}
+% }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+\begin{frame}{Lecture Outline}
+\tableofcontents
+\end{frame}
+\section{Sequence Alignment}
+\begin{frame}{}
+    \tableofcontents[currentsection]
+\end{frame}
+\begin{frame}{Sequence Alignment}
+\large{
+\begin{itemize}
+    \item Why do we need to align sequence?
+\end{itemize}
+}
+\end{frame}
+\begin{frame}{Why do we need to align sequence?}
+\begin{itemize}
+\item Comparing DNA/protein sequences for
+\begin{itemize}
+    \item Similarity
+    \item Homology
+\end{itemize}
+
+\item Prediction of function
+
+\item Construction of phylogeny
+ Shotgun assembly
+\begin{itemize}
+    \item  End-space-free alignment / overlap alignment
+\end{itemize}
+\item  Finding motifs
+\item Understanding Evolutionary Relationships
+\end{itemize}
+\end{frame}
+\begin{frame}{Sequence Alignment}
+\begin{itemize}
+    \item  Procedure of comparing to (Pairwise) or more (Multiple) sequences by searching for a series of individual characters that are in the same order in the sequence.
+    \linebreak
+    \linebreak
+    \linebreak
+    \resizebox{\linewidth}{!}{
+\begin{table}[scale=0.4\textwidth]
+\begin{tabular}{cccccccccccccccccccc}
+G & C & T & A & G & T & C & A & G & A & T & C & T & G & A & C & G & C & T & A \\
+ &  & | &  & | & | & | & | &  & | & | & | & | & | & | & | & | & | &  &  \\
+ &  & T & G & G & T & C & A & C & A & T & C & T & G & C & C & G & C &  & 
+\end{tabular}
+\end{table}}
+\newline
+\newline
+\end{itemize}
+\end{frame}
+\begin{frame}{Sequence Alignment}
+    \begin{itemize}
+        \item \textbf{\large{Definition}}
+        \linebreak
+        \linebreak
+        Given two strings $x = x_1 x_2 ... x_m$ and $y = y_1 y_2 ... y_n$, \linebreak
+        an alignment is an assignment of gaps to positions 0 ... M in x and 0 ... N in y, so as to line up each letter in one sequence with either a letter or a gap in the other sequence.
+    \end{itemize}
+\end{frame}
+\begin{frame}{A Simple Alignment}
+    \begin{itemize}
+        \item Let us try to align two short nucleotide sequences:\linebreak
+        -AATCTATA and AAGATA\linebreak
+        \linebreak
+        \item Without considering any gaps (insertions/deletions) there are 3 possible ways to align these sequences\linebreak
+        \linebreak
+        \resizebox{\linewidth}{!}{
+        \begin{table}[]
+\begin{tabular}{llllllllllllllllllllllllllll}
+\textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} &  & \textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} \\
+\textbf{A} & \textbf{A} & \textbf{G} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{G} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{G} & \textbf{A} & \textbf{T} & \textbf{A}
+\end{tabular}
+\end{table}}
+\linebreak
+    \item Which one is better?
+    \end{itemize}
+\end{frame}
+\begin{frame}{What is a Good Alignment}
+    \resizebox{\linewidth}{!}{
+    \begin{table}[]
+\begin{tabular}{llllllllllllllllllllllllllllll}
+\textbf{A} & \textbf{G} & \textbf{G} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{G} & \textbf{T} & \textbf{T} & \textbf{,} & \textbf{} & \textbf{} & \textbf{A} & \textbf{G} & \textbf{C} & \textbf{G} & \textbf{A} & \textbf{A} & \textbf{G} & \textbf{T} & \textbf{T} &  &  &  &  &  &  &  &  &  \\
+ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+\multicolumn{1}{c}{\textbf{A}} & \multicolumn{1}{c}{\textbf{G}} & \multicolumn{1}{c}{\textbf{G}} & \multicolumn{1}{c}{\textbf{C}} & \multicolumn{1}{c}{\textbf{T}} & \multicolumn{1}{c}{\textbf{A}} & \multicolumn{1}{c}{\textbf{G}} & \multicolumn{1}{c}{\textbf{T}} & \multicolumn{1}{c}{\textbf{T}} & \multicolumn{1}{c}{\textbf{-}} & \multicolumn{1}{c}{\textbf{}} & \multicolumn{1}{c}{\textbf{}} & \multicolumn{1}{c}{\textbf{}} & \multicolumn{17}{c}{\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Matches = 6\\ Mistatches = 3\\ Gap = 1\end{tabular}}}} \\
+\multicolumn{1}{c}{\textbf{A}} & \multicolumn{1}{c}{\textbf{G}} & \multicolumn{1}{c}{\textbf{C}} & \multicolumn{1}{c}{\textbf{G}} & \multicolumn{1}{c}{\textbf{A}} & \multicolumn{1}{c}{\textbf{A}} & \multicolumn{1}{c}{\textbf{G}} & \multicolumn{1}{c}{\textbf{T}} & \multicolumn{1}{c}{\textbf{T}} & \multicolumn{1}{c}{\textbf{T}} & \multicolumn{1}{c}{\textbf{}} & \multicolumn{1}{c}{\textbf{}} & \multicolumn{1}{c}{\textbf{}} & \multicolumn{17}{c}{} \\
+ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+\textbf{A} & \textbf{G} & \textbf{G} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{-} & \textbf{G} & \textbf{T} & \textbf{T} & \textbf{-} & \textbf{} & \textbf{} & \multicolumn{17}{c}{\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Matches = 7\\ Mismatches = 1\\ Gaps = 3\end{tabular}}}} \\
+\textbf{A} & \textbf{G} & \textbf{-} & \textbf{C} & \textbf{G} & \textbf{A} & \textbf{A} & \textbf{G} & \textbf{T} & \textbf{T} & \textbf{T} & \textbf{} & \textbf{} & \multicolumn{17}{c}{} \\
+ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\
+\textbf{A} & \textbf{G} & \textbf{G} & \textbf{C} & \textbf{-} & \textbf{T} & \textbf{-} & \textbf{G} & \textbf{T} & \textbf{T} & \textbf{-} & \textbf{} & \textbf{} & \multicolumn{17}{c}{\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Matches = 7\\ Mismatches = 0\\ Gaps = 5\end{tabular}}}} \\
+\textbf{A} & \textbf{G} & \textbf{-} & \textbf{C} & \textbf{G} & \textbf{-} & \textbf{A} & \textbf{A} & \textbf{G} & \textbf{T} & \textbf{T} & \textbf{} & \textbf{} & \multicolumn{17}{c}{}
+\end{tabular}
+\end{table}}
+\end{frame}
+\begin{frame}{Scoring the Alignments}
+    \begin{itemize}
+    \item We need to have a scoring mechanism to evaluate alignments
+    \begin{itemize}
+        \item match score
+        \item mismatch score
+        \linebreak
+    \end{itemize}
+    \linebreak
+    \item We can have the total score as:\linebreak
+    \begin{equation*}
+    \sum_{i=1}^n match\: or\: mismatch\: score\: at\: position\: i
+    \end{equation*}
+    
+    \linebreak
+    \item For the simple example, assume a match score of 1 and a mismatch score of 0:
+    \linebreak
+    \linebreak
+    \resizebox{\linewidth}{!}{
+    \begin{table}[]
+\begin{tabular}{llllllllllllllllllllllllllll}
+\textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} &  & \textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} \\
+\textbf{A} & \textbf{A} & \textbf{G} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{G} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{G} & \textbf{A} & \textbf{T} & \textbf{A} \\
+\multicolumn{1}{c}{\textbf{}} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \multicolumn{6}{c}{\textbf{}} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \multicolumn{6}{c}{\textbf{}} \\
+\multicolumn{6}{c}{\textbf{4}} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \multicolumn{6}{c}{\textbf{1}} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \multicolumn{6}{c}{\textbf{3}}
+\end{tabular}
+\end{table}
+    }
+    \end{itemize}
+\end{frame}
+\begin{frame}{Simple Alignment with Gaps}
+    \begin{itemize}
+        \item Considering gapped alignments vastly increases the number of possible alignments:\linebreak
+        \linebreak
+        \resizebox{\linewidth}{!}{
+        \begin{table}[]
+            \begin{tabular}{llllllllllllllllllllllllllll}
+            \textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} &  & \textbf{A} & \textbf{A} & \textbf{T} & \textbf{C} & \textbf{T} & \textbf{A} & \textbf{T} & \textbf{A} \\
+            \textbf{A} & \textbf{A} & \textbf{G} & \textbf{-} & \textbf{A} & \textbf{T} & \textbf{-} & \textbf{A} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{-} & \textbf{G} & \textbf{-} & \textbf{A} & \textbf{T} & \textbf{A} & \textbf{} & \textbf{} & \textbf{A} & \textbf{A} & \textbf{-} & \textbf{-} & \textbf{G} & \textbf{A} & \textbf{T} & \textbf{A} \\
+            \multicolumn{1}{c}{\textbf{}} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \multicolumn{1}{c}{\textbf{}} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \textbf{} & \multicolumn{1}{c}{\textbf{}} &  &  &  &  &  \\
+            \multicolumn{8}{c}{\textbf{1}} & \textbf{} & \textbf{} & \multicolumn{8}{c}{\textbf{3}} & \textbf{} & \textbf{} & \multicolumn{8}{c}{\textbf{3}}
+            \end{tabular}
+        \end{table}}
+        \linebreak
+        \linebreak
+        \item If gap penalty is -1, what will be the new scores?
+    \end{itemize}
+\end{frame}
+\section{Sequence Edits}
+\begin{frame}{}
+    \tableofcontents[currentsection]
+\end{frame}
+\begin{frame}{Sequence Edits}
+    \large{Lets do some sequence edits and view scores}
+\end{frame}
+\begin{frame}{Sequence Edits}
+    \large{Three types of sequence edits}
+        \begin{enumerate}
+            \item Mutations
+            \item Insertions
+            \item Deletions
+        \end{enumerate}
+\end{frame}
+\begin{frame}{Mutations}
+    \begin{table}[]
+        \begin{tabular}{ccccccc}
+        \textbf{A} & \textbf{G} & \textbf{G} & \textbf{C}                        & \textbf{C} & \textbf{T} & \textbf{C} \\
+        \textbf{A} & \textbf{G} & \textbf{G} & {\color[HTML]{FE0000} \textbf{A}} & \textbf{C} & \textbf{T} & \textbf{C}
+        \end{tabular}
+    \end{table}
+\end{frame}
+\begin{frame}{Insertions}
+    \begin{table}[]
+        \begin{tabular}{cccccccc}
+        \textbf{A} & \textbf{G} & \textbf{G} & \textbf{C}                        & \textbf{C} & \textbf{T} & \textbf{C} &            \\
+        \textbf{A} & \textbf{G} & \textbf{G} & {\color[HTML]{FE0000} \textbf{G}} & \textbf{C} & \textbf{C} & \textbf{T} & \textbf{C}
+        \end{tabular}
+    \end{table}
+\end{frame}
+\begin{frame}{Deletions}
+    \begin{table}[]
+\begin{tabular}{ccccccc}
+\textbf{A} & \textbf{G} & \textbf{G} & \textbf{C}                        & \textbf{C} & \textbf{T} & \textbf{C} \\
+\textbf{A} & \textbf{G} & \textbf{G} & {\color[HTML]{FE0000} \textbf{.}} & \textbf{C} & \textbf{T} & \textbf{C}
+\end{tabular}
+\end{table}
+\end{frame}
+\begin{frame}{Scoring Function}
+    \par Match: \quad+m\linebreak
+    \par Mismatch: \quad-s\linebreak
+    \par Gap: \quad-d
+    \linebreak
+    \linebreak
+    \linebreak
+    Score F = (\# matches) x m - (\# mismatches) x s - (\# gaps) x d
+\end{frame}
+\section{Score Matrix}
+\begin{frame}{}
+    \tableofcontents[currentsection]
+\end{frame}
+\begin{frame}{Score Matrix}
+   \begin{itemize}
+   \item Assign scores to each pair of symbol
+\begin{itemize}
+ \item   Higher score means more similarity.
+   \end{itemize} 
+   \end{itemize} 
+\end{frame}
+\begin{frame}{Score Matrix}
+\begin{itemize}
+       \item DNA
+\begin{itemize}
+       \item  Match = +1
+        \item  Mismatch = -3
+         \item   Gap penalty = -5
+          \item  Gap extension penalty = -2
+
+   \end{itemize} 
+   \item Protein sequences
+\begin{itemize}
+ \item Blossum62 matrix
+         \item   Gap open penalty = -11
+          \item  Gap extension penalty = -1
+   \end{itemize} 
+   \end{itemize}
+\end{frame}
+ \section{Dynamic Programming}
+  \begin{frame}{}
+    \tableofcontents[currentsection]
+\end{frame}
+ \begin{frame}{}
+    \large{
+    \begin{itemize}
+ \item How do we compute the best alignment?
+   \end{itemize} 
+   
+    }  
+ \end{frame}
+  \begin{frame}{Alignment is Additive}
+   
+    \begin{itemize}
+ \item Observation:
+
+ \par The score of aligning $x_1...x_M$ and $y_1...y_N$ is additive
+ \newline 
+\par
+   Say that \quad $x_1...x_i$ \quad $x_{i+1}...x_M$ \linebreak \quad aligns to \quad $y_1...x_j$ \quad $x_{j+1}...x_N$
+   \newline
+    \newline
+    The two scores add up:
+    \quad
+   $$$F(x[1:M], y[1:N]) = F(x[1:i], y[1:j]) + F(x[i+1:M], y[j+1:N])$$
+   
+   \end{itemize} 
+ \end{frame}
+ \begin{frame}{Types of Alignment}
+    \begin{itemize}
+ \item Global
+          \begin{itemize}
+     \item Strings of similar size
+      \begin{itemize}
+     \item Genes with a similar structure
+     \item Larger regions with a preserved order (syntenic
+regions)
+   \end{itemize} 
+   \end{itemize} 
+   \item Local
+    \begin{itemize}
+     \item Finding similar regions among:
+      \begin{itemize}
+     \item Dissimilar regions
+     \item Sequences of different lengths
+   \end{itemize} 
+   \end{itemize}
+   \end{itemize}  
+ \end{frame}
+  \begin{frame}{Dynamic Programming}
+     \begin{itemize}
+         \item Instead of evaluating every possible alignment, we can create a 
+table of partial scores by breaking the alignment problem into subproblems.
+\item Consider two sequences CACGA and CGA
+\begin{itemize}
+         \item we have three possibilities for the first position of the alignment
+         \newline
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[]
+\begin{tabular}{|c|c|c|}
+\hline
+First Position & Score               & Remaining seqs \\ \hline
+C              & \multirow{2}{*}{+1} & ACGA           \\
+C              &                     & GA             \\ \hline
+--             & \multirow{2}{*}{-1} & CACGA          \\
+C              &                     & GA             \\ \hline
+C              & \multirow{2}{*}{-1} & ACGA           \\
+--             &                     & CGA            \\ \hline
+\end{tabular}
+\end{table}
+     \end{itemize}
+     \end{itemize}
+ \end{frame}
+ 
+ \section{Local Sequence Alignment}
+  \begin{frame}{}
+    \tableofcontents[currentsection]
+\end{frame}
+ \begin{frame}{Local Sequence Alignment}
+\begin{itemize}
+    \item Suppose we have a long DNA sequence (eg 4000 bp) and we want to compare it with the 
+complete yeast genome (12.5Mbp)
+\item What if only a portion of our query, say 200 bp
+length, has strong similarity to a gene in yeast.
+\end{itemize}   
+ \end{frame}
+  \begin{frame}{Local Sequence Alignment Problem}
+\begin{itemize}
+    \item Given two strings 
+    $$x=x_1.....x_M$$ 
+     $$y=y_1.....x_N$$
+\end{itemize} 
+Find substring $y^,$, $x^,$ whose similarity
+(optimal global alignment value) is maximum.
+ $$ x = aaaacc\underline{cccggg}gtta $$
+ $$ y = tt\underline{cccggg}aaccaacc $$
+
+ \end{frame}
+ \section{Smith \& Waterman Algorithm}
+  \begin{frame}{}
+    \tableofcontents[currentsection]
+\end{frame}
+ \begin{frame}{Smith \& Waterman Algorithm}
+    \begin{itemize}
+        \item $F(i,j)$= optimal local similarity among suffixes $ A(1:i)$ and $B(1:j)$
+        \item Recurrence relation
+        \begin{itemize}
+            \item $F(i,0) = 0$
+            \item $F(0,j) = 0$
+            \item F(i,j) = max \begin{cases} 
+             0 \\
+             F(i,j-1) + s(-,B(j)) \\
+             F(i-1,j) + s(A(i),-) \\
+             F(i-1,j-1) + s(A(i),B(j))
+            \end{cases}
+        \end{itemize}
+    \end{itemize} 
+ \end{frame}
+ \section{Example}
+  \begin{frame}{}
+    \tableofcontents[currentsection]
+\end{frame}
+ \begin{frame}{Example}
+  \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\end{columns}
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                    & E                     & Q                     & L                     & L                     & K                     & A                     & L                     & E                     & F                     & K                     & L                     \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &        \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \cline{2-13}  %26
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+  
+ \end{frame}
+ 
+ \begin{frame}{Example}
+   \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Algorithm}
+F(i,0) = 0\\
+F(0,j) = 0
+\end{block}
+\end{columns}
+     
+     \begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & K                      & A                      & L                      & E                      & F                      & K                      & L                      \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  &       \multicolumn{1}{l|}{}  \\ \cline{2-13} %27  
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+     
+ \end{frame}
+ 
+ \begin{frame}{Example}
+     \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} 
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Algorithm}
+ F(i, j) =  max [0, F(i,j-1) + s(-,Q(j)),F(i-1,j) + s(P(i),-),F(i-1,j-1) + s(P(i),Q(j)]
+\end{block}
+
+\end{columns}
+     
+     \begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & \cellcolor[HTML]{FF0000}E                      & Q                      & L                      & L                      & K                      & A                      & L                      & E                      & F                      & K                      & L                      \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  &    \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13}  %28
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+     
+ \end{frame}
+ 
+ \begin{frame}{Example}
+     \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Algorithm}
+ F(i, j) =  max [0, F(i,j-1) + s(-,Q(j)),F(i-1,j) + s(P(i),-),F(i-1,j-1) + s(P(i),Q(j)]
+\end{block}
+\end{columns}
+     
+     \begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & \cellcolor[HTML]{FF0000}Q                      & L                      & L                      & K                      & A                      & L                      & E                      & F                      & K                      & L                      \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  &      \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} %29
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+     
+ \end{frame}
+ 
+ \begin{frame}{Example}
+     \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Algorithm}
+ F(i, j) =  max [0, F(i,j-1) + s(-,Q(j)),F(i-1,j) + s(P(i),-),F(i-1,j-1) + s(P(i),Q(j)]
+\end{block}
+\end{columns}
+     
+     \begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      &\cellcolor[HTML]{FF0000} L                      & L                      & K                      & A                      & L                      & E                      & F                      & K                      & L                      \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  &    \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13}  %30
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+     
+ \end{frame}
+ 
+ \begin{frame}{Example}
+     \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Algorithm}
+ F(i, j) = max [0, F(i,j-1) + s(-,Q(j)),F(i-1,j) + s(P(i),-),F(i-1,j-1) + s(P(i),Q(j)]
+\end{block}
+\end{columns}
+     
+     \begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & \cellcolor[HTML]{FF0000}L                      & K                      & A                      & L                      & E                      & F                      & K                      & L                      \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  &    \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13}  %30
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+     
+ \end{frame}
+ 
+ 
+  \begin{frame}{Example}
+     \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Algorithm}
+ F(i, j) =  max [0, F(i,j-1) + s(-,Q(j)),F(i-1,j) + s(P(i),-),F(i-1,j-1) + s(P(i),Q(j)]
+\end{block}
+\end{columns}
+     
+     \begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & \cellcolor[HTML]{FFFF00}K                      & A                      & L                      & E                      & F                      & K                      & L                      \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}K}  & \multicolumn{1}{l|}{0} &      \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13}  %31
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+     
+ \end{frame}
+ 
+ 
+ \begin{frame}{Example}
+     \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Algorithm}
+ F(i, j) =  max [0, F(i,j-1) + s(-,Q(j)),F(i-1,j) + s(P(i),-),F(i-1,j-1) + s(P(i),Q(j)]
+\end{block}
+\end{columns}
+     
+     \begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & \cellcolor[HTML]{FFFF00}K                      & A                      & L                      & E                      & F                      & \cellcolor[HTML]{FFFF00}K                      & L                      \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}K}  & \multicolumn{1}{l|}{0} &      \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13}  %31
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  & \multicolumn{1}{l|}{}  \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+     
+ \end{frame}
+ 
+ \begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Algorithm}
+ F(i, j) =  max [0, F(i,j-1) + s(-,Q(j)),F(i-1,j) + s(P(i),-),F(i-1,j-1) + s(P(i),Q(j)]
+\end{block}
+\end{columns}
+     \begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & K                      & A                      & L                      & E                       & F                       & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{6} & \multicolumn{1}{l|}{5}  & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  &     \multicolumn{1}{l|}{7}  \\ \cline{2-13}  %32
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{10} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{7}  & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+ \end{frame}
+ 
+ 
+ \begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad . . . . . F \\
+P:\quad . . . . . F
+\end{block}
+\end{columns}
+
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & K                      & A                      & L                      & E                       & \cellcolor[HTML]{FFFF00}F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13}  %35
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{6} & \multicolumn{1}{l|}{5}  & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} &          \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{7}  & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+ \begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad . . . . E F \\
+P:\quad . . . . E F
+\end{block}
+\end{columns}
+
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & K                      & A                      & L                      &\cellcolor[HTML]{FFFF00}E                       & F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13}  %35
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{6} & \multicolumn{1}{l|}{5}  & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} &          \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{7}  & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+ \begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad . . . L E F \\
+P:\quad . . . L E F
+\end{block}
+\end{columns}
+
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & K                      & A                      & \cellcolor[HTML]{FFFF00}L                      &E                       & F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13}  %35
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}6} & \multicolumn{1}{l|}{5}  & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} &          \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{7}  & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+ \begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad . . - L E F \\
+P:\quad . . V L E F
+\end{block}
+\end{columns}
+
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & K                      & \cellcolor[HTML]{FF0000}A                      & L                      &E                       & F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13}  %35
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}6} & \multicolumn{1}{l|}{5}  & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} &          \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{7}  & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+
+\end{frame}
+ \begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad . A - L E F \\
+P:\quad . - V L E F
+\end{block}
+\end{columns}
+
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & K                      & \cellcolor[HTML]{FF0000}A                      & L                      &E                       & F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13}  %35
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}6} & \multicolumn{1}{l|}{5}  & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} &          \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{7}  & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad K A - L E F \\
+P:\quad K - V L E F
+\end{block}
+\end{columns}
+
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & \cellcolor[HTML]{FFFF00}K                      & A                      & L                      &E                       & F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{\cellcolor[HTML]{FFFF00}K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}4} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13}  %35
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}6} & \multicolumn{1}{l|}{5}  & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} &          \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{7}  & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad K A - L E F \\
+P:\quad K - V L E F
+\end{block}
+\end{columns}
+
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                      & K                      & A                      & L                      &E                       & F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}4} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13}  %35
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}6} & \multicolumn{1}{l|}{5}  & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} &          \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{9}  & \multicolumn{1}{l|}{\cellcolor[HTML]{00FF00}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{7}  & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad K - A L E F \\
+P:\quad K V - L E F
+\end{block}
+\end{columns}
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                                              & K                                              & A                                              & L                                              & E                                               & F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}0} & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{1}                          & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}3}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}2} & \multicolumn{1}{l|}{1}                         & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13}  %36
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4}                         & \multicolumn{1}{l|}{3}                         & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}6} & \multicolumn{1}{l|}{5}                          & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3}                         & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{1}                         & \multicolumn{1}{l|}{5}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{1}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{4}                         & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{3}                         & \multicolumn{1}{l|}{8}                          & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{7}                          & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table} 
+\end{frame}
+\begin{frame}{Example}
+ \centering
+ \textcolor{blue}{Q} = E Q L L K A L E F K L \quad \textcolor{blue}{P} = K V L E F G Y
+\begin{columns}
+\column{0.3\textwidth}
+\begin{block}{Linear gap model} \\
+Gap= -1 \\
+Match= 4 \\
+Mismatch= -2
+\end{block}
+\column{0.6\textwidth}
+\begin{block}{Alignment}
+Q:\quad K A L E F \\
+P:\quad K V L E F
+\end{block}
+\end{columns}
+\begin{table}[]
+\centering
+\begin{tabular}{*{13}{p{0.4cm}}}
+                        & --                     & E                      & Q                      & L                      & L                                              & K                                              & A                                              & L                                              & E                                               & F                                               & K                       & L                       \\ \cline{2-13} 
+\multicolumn{1}{l|}{--} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} &  \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}0} & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}  & \multicolumn{1}{l|}{0}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{K}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}                         &\multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{1}                          & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{4}  & \multicolumn{1}{l|}{3}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{V}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}2} & \multicolumn{1}{l|}{1}                         & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{0}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{2}  \\ \cline{2-13} %37
+\multicolumn{1}{l|}{L}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{4}                         & \multicolumn{1}{l|}{3}                         & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}6} & \multicolumn{1}{l|}{5}                          & \multicolumn{1}{l|}{4}                          & \multicolumn{1}{l|}{3}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13}
+\multicolumn{1}{l|}{E}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{3}                         & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{1}                         & \multicolumn{1}{l|}{5}                         & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}10} & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{8}  & \multicolumn{1}{l|}{7}  \\ \cline{2-13} 
+\multicolumn{1}{l|}{F}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{1}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{4}                         & \multicolumn{1}{l|}{9}                          & \multicolumn{1}{l|}{\cellcolor[HTML]{3166FF}14} & \multicolumn{1}{l|}{13} & \multicolumn{1}{l|}{12} \\ \cline{2-13} 
+\multicolumn{1}{l|}{G}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{1}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{3}                         & \multicolumn{1}{l|}{8}                          & \multicolumn{1}{l|}{13}                         & \multicolumn{1}{l|}{12} & \multicolumn{1}{l|}{11} \\ \cline{2-13} 
+\multicolumn{1}{l|}{Y}  & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0} & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{0}                         & \multicolumn{1}{l|}{2}                         & \multicolumn{1}{l|}{7}                          & \multicolumn{1}{l|}{12}                         & \multicolumn{1}{l|}{11} & \multicolumn{1}{l|}{10} \\ \cline{2-13} 
+\end{tabular}
+\end{table}
+\end{frame}
+\begin{frame}{References}   
+    \begin{itemize}
+        \item https://ocw.metu.edu.tr/course/view.php?id=37
+        \item https://www.cs.cmu.edu/~ckingsf/bioinfo-lectures/local.pdf
+    \end{itemize}
+
+\end{frame}
+\begin{frame}[plain]
+
+      \begin{center}
+
+        \font\endfont = cmss10 at 15.40mm
+        \color{Brown}
+        \endfont 
+        \baselineskip 20.0mm
+
+        Thank you
+
+      \end{center} 
+      \begin{center}
+
+        \font\endfont = cmss10 at 5.40mm
+        \color{Brown}
+        \endfont 
+        \baselineskip 20.0mm
+
+        Stay Home, Stay Safe
+
+      \end{center} 
+
+\end{frame}
+\end{document}

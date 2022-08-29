@@ -1,0 +1,123 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{graphicx}
+
+\title{CSE 300 A1: Class 1}
+\author{Tawhidul Bhuiyan}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This is the intro. 
+This is the intro.
+This is the intro.
+This is the intro.
+This is the intro. \\
+This is the first \LaTeX class. 
+This is the first \LaTeX class.
+
+\subsection{Part A} \label{subsec:a}
+This is part A.
+
+\subsection{Part B}
+This is part B. This is part B. This is part B. This is. Look back at subsection~\ref{subsec:a}.
+
+\section{Equation}
+\begin{equation} \label{eq:normal}
+    \mathcal{N}(x_i;\mu,\sigma)=\frac{1}{2\sqrt{\pi}\sigma}e^{-\frac{(x-\mu)^{2}}{2\sigma^2}}
+\end{equation}
+
+$\mathcal{N}(x_i;\mu,\sigma)=\frac{1}{2\sqrt{\pi}\sigma}e^{-\frac{(x-\mu)^{2}}{2\sigma^2}}$
+
+Look at equation~\eqref{eq:normal}
+
+\begin{equation}
+    |x| = 
+    \begin{cases}
+    \ x  & \text{ if } x \geq 0\\
+    -x & \text{ if } x < 0
+    \end{cases}
+\end{equation}
+
+\begin{align}
+    f(x) 
+    & = (x-1)(x+1) \nonumber \\ 
+    & \qquad + e^x \nonumber \\
+    & = x^2-1 + e^x
+\end{align}
+
+\section{Table}
+\begin{tabular}{|c p{2cm}|}
+    \hline
+    x & y (in centimeter) \\
+    \hline
+    1 & 2 \\
+    200 & 400 \\
+    \hline
+\end{tabular}
+
+\subsection{Multi-column}
+
+\begin{tabular}{|c|ccc|}
+	\hline
+	1 & \multicolumn{3}{c|}{text} \\ 
+	\cline{2-4}
+	1 & 2 & 3 & 4  \\
+	\hline
+
+\end{tabular}
+
+\subsection{Cell-wise align}
+\begin{tabular}{|c c|}
+    \hline
+    x & y \\
+    \hline
+    1 & \multicolumn{1}{r|}{2} \\
+    200 & 400 \\
+    \hline
+\end{tabular}
+
+
+\subsection{Multi-row Table}
+
+\begin{tabular}{|c|c|c|}
+	\hline
+	1 & 2 & 3 \\ 
+	\hline
+	\multirow{2}{*}{text} & 4 & 5 \\
+	& 6 & 7 \\ 
+	\hline
+
+
+\end{tabular}
+
+\subsection{Table}
+\begin{table}[tbp]
+    \centering
+    \begin{tabular}{|c c|}
+        \hline
+        x & y \\
+        \hline
+        1 & 2 \\
+        200 & 400 \\
+        \hline
+    \end{tabular}
+    \caption{New Table}
+    \label{tab:my_label}
+\end{table}
+
+\section{Figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{buet_logo.png}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
+
+\end{document}

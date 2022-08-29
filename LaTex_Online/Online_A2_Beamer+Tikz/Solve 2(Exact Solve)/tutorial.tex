@@ -1,0 +1,121 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usetheme{Madrid}
+
+\title{Induction}
+\subtitle{Strong Induction \& Weak Induction}
+\author{Mobaswirul Islam}
+\institute[CSE, BUET]{Computer Science \& Engineering, Bangladesh University of Engineering \& Technology}
+\date{\today}
+\logo{\includegraphics[height=.4cm]{logo_2.jpg}}
+
+\begin{document}
+
+\begin{frame}{}
+    \titlepage
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{What is Induction?}
+    \begin{itemize}
+        \item Proof technique \pause
+        \item Simple yet efficient method \pause
+        \item Proves a statement for a set of numbers
+    \end{itemize}
+\end{frame}
+
+\section{Steps \& Types}
+
+\begin{frame}{Steps \& Types}
+\begin{columns}
+    \begin{column}{0.3\textwidth}
+    \textbf{Steps}
+    \begin{itemize}
+        \item Base Step
+        \item Inductive Step
+    \end{itemize}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+    \pause
+    \textbf{Types}
+    \begin{itemize}
+        \item Weak Induction (Regular Induction)
+        \item Inductive Step
+    \end{itemize}
+    \end{column}
+\end{columns}
+\end{frame}
+
+\section{Principles}
+\begin{frame}{Principles of \textit{Weak Induction}}
+    \begin{enumerate}
+        \item \textbf{Base Step}: verify $P(1) \implies P(0)$ \pause
+        \item \textbf{Inductive Step}: prove $P(n) \implies P(n+1)$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Principles of \textit{Strong Induction}}
+    \begin{enumerate}
+        \item \textbf{Base Step}: verify $P(1) \implies P(0)$
+        \item \textbf{Inductive Step}: prove 
+        $\forall k \in N: k \leq n, P(k) \implies P(n+1)$
+    \end{enumerate}
+\end{frame}
+
+\section{Equivalence}
+\begin{frame}{Equivalence of Weak \& Strong Induction}
+    \setbeamercovered{transparent}
+    \begin{itemize}
+        \item<1,3> If a statement can be proven by \textbf{Weak Induction}, it can be proven by \textbf{Strong Induction}
+        \item<2,3> If a statement can be proven by \textbf{Strong Induction}, it can be proven by \textbf{Weak Induction}
+        \item<3> First one is left for exercise.
+    \end{itemize}
+    \setbeamercovered{invisible}
+\end{frame}
+
+\section{Strong to Weak}
+\begin{frame}{If provable by Strong, can be proven by Weak}
+Let, a statement be P. $\forall n \in N, P(n)$
+If P can be proven by \textbf{Strong Induction}
+\begin{enumerate}
+    \item $P(1)$ is true
+    \item $\forall k \in N : k \leq P(k) \implies P(n+1)$
+    We are to prove, $P$ can be proven using \textit{Weak Induction}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{If provable by Strong, can be proven by Weak}
+    Define, 
+    \begin{equation*} \label{eq1}
+        \begin{split}
+            Q(n) & = \forall k, n \in N : k \leq n, P(k) \\
+            & = P(1) \land P(2) \land P(3) \ldots P(n)
+\end{split}
+\end{equation*}
+
+It is Obvious, $Q(1)$ is true, as $Q(1) = P(1)$\\
+Rewriting we get, $\forall n \in N, Q(n) \implies P(n+1)$\\
+As, $(A\implies B) \land (A\implies C) \implies (A \implies (B \land C))$\\
+So, we get,
+\begin{equation*}
+    \begin{split}
+        Q(n) &\implies Q(n) \land P(n+1)\\
+        &\implies P(1) \land P(2) \ldots P(n) \land P(n+1) \\
+        Q(n) &\implies Q(n+1)\\
+    \end{split}
+\end{equation*}
+\end{frame}
+
+\begin{frame}{If provable by Strong, can be proven by Weak}
+
+Now, 
+$$Q(1) \land (\forall n \in N, Q(n) \implies Q(n+1)) \implies \forall n \in N, Q(n)$$
+which is the weak inductive principle
+\\
+From our assumption, $Q(n)$ can never be true without $P(n)$\\
+So, $Q(n) \implies P(n)$\\
+Therefore, the statement $P(n)$ for all n is just proved by using weak induction.
+\end{frame}
+
+
+\end{document}
