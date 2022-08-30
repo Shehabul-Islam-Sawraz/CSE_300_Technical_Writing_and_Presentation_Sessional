@@ -1,0 +1,35 @@
+
+\begin{minipage}{.7\linewidth}
+
+    
+
+\begin{algorithm} [H]
+\renewcommand{\thealgorithm}{}
+\SetAlgoLined
+
+DFS(G)
+
+\For{ each vertex $\displaystyle{u}$ \in  $\displaystyle{G.V}$} {
+
+    $\displaystyle{u.color}$ = WHITE
+    
+    $\displaystyle{u.\pi}$ = NIL
+    
+   }
+    
+ $\displaystyle{time}$ = 0
+
+\For{each vertex $\displaystyle{u}$ \in $\displaystyle{G.V}$} {
+
+    \textbf{if} {$\displaystyle{ u.color}$ == WHITE}{
+        
+        DFS-VISIT($\displaystyle{G,u}$) 
+        
+         }
+         
+    }
+    
+\end{algorithm}
+
+
+\end{minipage}

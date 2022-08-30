@@ -1,0 +1,64 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Pythagorean Theorem}
+\author{Shehabul Islam Sawraz}
+\date{\today}
+
+% \usepackage{lipsum}
+\usepackage{subfiles}
+\usepackage[algoruled, linesnumbered]{algorithm2e}
+\newtheorem{theorem}{Theorem}[section]
+\usepackage{listings}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+\definecolor{background_trngl}{RGB}{215,235,242}
+\definecolor{sq_a}{RGB}{164,117,169}
+\definecolor{sq_b}{RGB}{245,168,150}
+\definecolor{sq_c}{RGB}{29,181,220}
+\definecolor{text_trngl}{RGB}{127,37,120}
+\definecolor{circle}{RGB}{16,45,105}
+
+
+
+\begin{document}
+
+\maketitle
+\section{Introduction}
+In this document, we present the very famous theorem in mathematics:  \textit{Pythagorean
+theorem}, which is stated as follows.
+
+\subfile{PythThm.tex}
+\subfile{PythTriangle.tex}
+\newpage
+\subfile{PythCircle.tex}
+
+
+\section{Trigonometric Forms}
+Lots of other forms of the same theorem exist. The most useful, perhaps, are
+expressed in trigonometric terms, as follows:
+
+\begin{equation}
+    sin^2\theta + cos^2\theta = 1
+\label{eqn:eqn1}
+\end{equation}
+\begin{equation}
+    sec^2\theta - tan^2\theta = 1
+\label{eqn:eqn2}
+\end{equation}
+\begin{equation}
+    cosec^2\theta - cot^2\theta = 1
+\label{eqn:eqn3}
+\end{equation}
+
+\subsection{Representing the First}
+Taking \ref{eqn:eqn1}, we can show them as shown in Figure\ref{fig:fig2}. When we take a point at
+unit distance from the origin, the y and x co-ordinates become sin$\theta$ and cos$\theta$
+respectively. Therefore, sum of the squares of the two becomes equal to the
+square of the unit distance, which of course, is 1.
+
+\end{document}

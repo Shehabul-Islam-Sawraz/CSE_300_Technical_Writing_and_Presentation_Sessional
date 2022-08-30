@@ -1,0 +1,36 @@
+\begin{minipage}{.7\textwidth}
+
+%DFS-VISIT(\displaystyle{G,u})
+\begin{algorithm} [H]
+
+\renewcommand{\thealgorithm}{}
+
+%\setAlgolined
+%\renewcommand\thealgorithm{}
+DFS-VISIT(\displaystyle{G,u})
+
+$\displaystyle{time}$ = $\displaystyle{time}$ +1
+
+$\displaystyle{u.d}$ = $\displaystyle{time}$
+
+$\displaystyle{u.color}$ = GRAY
+
+\For{each $\displaystyle{ v \in G.Adj[u]}$} {
+    
+    \textbf{if} {$\displaystyle{v.color}$ == WHITE}{
+        
+        $\displaystyle{v. \pi}$ = $\displaystyle{u}$
+        
+         DFS-VISIT($\displaystyle{G,v}$)
+        }
+        
+    }
+    
+$\displaystyle{u.color}$ = BLACK
+
+$\displaystyle{time}$ = $\displaystyle{time}$+1
+
+$\displaystyle{u.f}$=$\displaystyle{time}$
+
+\end{algorithm}
+\end{minipage}

@@ -1,0 +1,153 @@
+\begin{figure}
+    \begin{tikzpicture}[scale=.3]
+        \centering
+        
+        %\draw [ultra thick,help lines] (-20,-10) grid(20,10);
+        
+        %\draw [ultra thick,help lines] (-15,-10) grid(15,10);
+        
+       %\draw [line width=.3pt] (-15,0) -- (15,0); %x axis
+        %\draw [line width=.3pt] (0,-10) -- (0,10); % y axis
+        
+        \draw  (-2,3) ellipse (1.5cm and 0.5cm); 
+        \node[center,scale=.5] at(-2,3) {\textcolor{black}{shirt}}; 
+        
+        \draw  (-2,0) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-2,0) {\textcolor{black}{tie}}; 
+        
+        \draw  (-2,-3) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-2,-3) {\textcolor{black}{jacket}}; 
+        
+        \draw  (3,6) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(3,6) {\textcolor{black}{shoes}}; 
+        
+        \draw  (-8,6) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-8,6) {\textcolor{black}{pants}}; 
+        
+        \draw  (-8,1) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-8,1) {\textcolor{black}{belt}}; 
+        
+        \draw  (3,9) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(3,9) {\textcolor{black}{socks}}; 
+        
+        \draw  (8,8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(8,8) {\textcolor{black}{watch}}; 
+        
+        \draw [<-=latex,->=latex,thick] (-2,2.5) -- (-2,.5);  %shirt to tie
+        \draw [<-=latex,->=latex,thick] (-2,-.5) -- (-2,-2.5);  %tie to jacket
+        \draw [<-=latex,->=latex,thick] (-6.5,6) -- (1.5,6);  %pants to shoes
+        \draw [<-=latex,->=latex,thick] (3,8.5) -- (3,6.5);  %socks to shoes
+        \draw [<-=latex,->=latex,thick] (-8,5.5) -- (-8,1.5);  %pants to belt
+        \draw [<-=latex,->=latex,thick] (-8,.5) -- (-3.5,-3);  %belt to jacket
+        \draw [<-=latex,->=latex,thick] (-3.5,3) -- (-6.5,1);  %shirt to belt  
+                \pause
+        
+        \node[right,scale=.5] at(-0.5,3) {\textcolor{black}{1/}}; \pause
+        \node[right,scale=.5] at(-0.5,0) {\textcolor{black}{2/}}; \pause
+        \node[right,scale=.5] at(-0.5,-3) {\textcolor{black}{3/}}; \pause
+        \node[right,scale=.5] at(-0.5,-3) {\textcolor{black}{3/4}};  \pause
+        
+        \draw[fill=yellow]  (-2,-3) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-2,-3) {\textcolor{black}{jacket}};
+        \draw  (18,-8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(18,-8) {\textcolor{black}{jacket}};
+        
+        \pause
+        
+        \node[right,scale=.5] at(-0.5,0) {\textcolor{black}{2/5}}; \pause
+        
+        \draw[fill=yellow]  (-2,0) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-2,0) {\textcolor{black}{tie}};
+        \draw  (13,-8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(13,-8) {\textcolor{black}{tie}};
+        
+        \pause
+        
+        \draw [<-=latex,->=latex,thick] (14.5,-8) -- (16.5,-8);  %tie to jacket
+        \pause
+        
+        
+        \node[right,scale=.5] at(-11,1) {\textcolor{black}{ 6/}}; \pause
+        \node[right,scale=.5] at(-11,1) {\textcolor{black}{6/7}}; \pause
+        
+        \draw[fill=yellow]  (-8,1) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-8,1) {\textcolor{black}{belt}};
+        \draw  (8,-8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(8,-8) {\textcolor{black}{belt}};
+        
+        \pause
+        
+        \draw [->=latex,thick] (8,-7.5) to [out=90,in=-180] (13,-5) to [out=0,in=90] (18,-7.5); %belt to jacket
+        \pause
+        
+        \node[right,scale=.5] at(-0.5,3) {\textcolor{black}{1/8}}; \pause
+        
+        \draw[fill=yellow]  (-2,3) ellipse (1.5cm and 0.5cm); 
+        \node[center,scale=.5] at(-2,3) {\textcolor{black}{shirt}};
+        \draw  (3,-8) ellipse (1.5cm and 0.5cm); 
+        \node[center,scale=.5] at(3,-8) {\textcolor{black}{shirt}}; 
+        
+        \pause
+        
+        \draw [<-=latex,->=latex,thick] (4.5,-8) -- (6.5,-8);  %shirt to belt
+        \pause
+        \draw [->=latex,thick] (3,-7.5) to [out=90,in=-180] (8,-4) to [out=0,in=90] (13,-7.5); %shirt to tie
+        
+        \node[right,scale=.5] at(8,7) {\textcolor{black}{9/}}; \pause
+        \node[right,scale=.5] at(8,7) {\textcolor{black}{9/10}}; \pause
+        
+        \draw[fill=yellow]  (8,8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(8,8) {\textcolor{black}{watch}};
+        \draw  (-2.5,-8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-2.5,-8) {\textcolor{black}{watch}}; \pause
+        
+        \node[right,scale=.5] at(-9,7) {\textcolor{black}{11/}}; \pause
+        \node[right,scale=.5] at(3,5) {\textcolor{black}{12/}}; \pause
+        \node[right,scale=.5] at(3,5) {\textcolor{black}{12/13}}; \pause
+        
+        \draw[fill=yellow]  (3,6) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(3,6) {\textcolor{black}{shoes}};
+        \draw  (-8,-8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-8,-8) {\textcolor{black}{shoes}}; \pause
+        
+        
+        
+        \node[right,scale=.5] at(-9,7) {\textcolor{black}{11/14}}; \pause
+        
+        \draw[fill=yellow]  (-8,6) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-8,6) {\textcolor{black}{pants}};
+        \draw  (-13,-8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-13,-8) {\textcolor{black}{pants}}; 
+        
+        \pause
+        
+        \draw [<-=latex,->=latex,thick] (-11.5,-8) -- (-9.5,-8);  %pants to shoes
+        \pause
+        
+        \draw [->=latex,thick] (-13,-7.5) to [out=90,in=-180] (-8,-5) -- (2.5,-5) to [out=0,in=90] (7.5,-7.6); %pants to belt
+        \pause
+        
+        \node[right,scale=.5] at(4.5,9) {\textcolor{black}{15/}}; \pause
+        \node[right,scale=.5] at(4.5,9) {\textcolor{black}{15/16}}; \pause
+
+        \draw[fill=yellow]  (3,9) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(3,9) {\textcolor{black}{socks}};
+        \draw  (-18,-8) ellipse (1.5cm and 0.5cm);
+        \node[center,scale=.5] at(-18,-8) {\textcolor{black}{socks}}; \pause 
+        \draw [->=latex,thick] (-18,-7.5) to [out=90,in=-180] (-13,-5) to [out=0,in=90] (-8,-7.5); %socks to shoes
+        
+        
+       %\draw [line width=.3pt] (-20,0) -- (20,0); %x axis
+        %\draw [line width=.3pt] (0,-10) -- (0,10); % y axis
+        
+        
+        
+        
+        
+        
+        
+
+
+    
+    \end{tikzpicture}
+\end{figure}

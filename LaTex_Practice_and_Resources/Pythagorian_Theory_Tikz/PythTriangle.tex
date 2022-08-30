@@ -1,0 +1,45 @@
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=0.5]
+        
+        \coordinate (A) at (1,4);
+        \coordinate (B) at (-1,0);
+        \coordinate (C) at (1,0);
+        \coordinate (node_a) at (0,0);
+        \coordinate (node_b) at (1,2);
+        \coordinate (node_c) at (0,2);
+        \coordinate (node_a2) at (1,-3.85);
+        \coordinate (node_b2) at (4.75,-3.85);
+        \coordinate (node_c2) at (-3.75,-3.85);
+       
+        \path [fill=background_trngl] (-7,-7) -- (7,-7) -- (7,7) -- (-7,7) -- (-7,-7);
+     
+        \path [fill=sq_a]  (C) -- (1,-2) -- (-1,-2) -- (-1,0) -- (C);
+        \path [fill=sq_b]  (C) -- (4.5,0) -- (4.5,4) -- (1,4) -- (C);
+        \path [fill=sq_c]  (A) -- (-3,6) -- (-5,2) -- (-1,0) -- (A);
+        
+        \draw [orange,line width=1pt] (A) -- (B) --  (C) -- (A); % triangle
+        
+        \draw [sq_c] (1,.5) -- (.6,.5) -- (.6,0); % right angle
+
+        \path [fill=sq_a] (0,-5.5) --(2,-5.5) -- (2,-3.5) -- (0,-3.5) -- (0,-5.5); %a2 fill
+        \path [fill=sq_b] (3,-6.25) -- (6.5,-6.25) -- (6.5,-3) -- (3,-3) -- (3,-6.25); % b2 fill
+        \path [fill=sq_c] (-6,-2.5) -- (-1.5,-2.5) -- (-1.5,-6.5) -- (-6,-6.5) -- (-6,-2.5); %c2 fill
+
+
+        \node [above,scale=1.5,font=\bfseries] at (-.75,-5) {\color{text_trngl}{$=$}};
+        \node [above,scale=1.5,font=\bfseries] at (2.5,-5)  {\color{text_trngl}{$+$}};
+        
+        \node [below,scale=1.2,font=\bfseries] at (node_a) {\color{text_trngl}{a}};
+        \node [right,scale=1.2,font=\bfseries] at (node_b) {\color{text_trngl}{b}};
+        \node [left, scale=1.2,font=\bfseries] at (node_c) {\color{text_trngl}{c}};
+        
+        \node [below,scale=1.2,font=\bfseries] at (node_a2) {\color{text_trngl}{a$^2$}};
+        \node [below,scale=1.2,font=\bfseries] at (node_b2) {\color{text_trngl}{b$^2$}};
+        \node [below,scale=1.2,font=\bfseries] at (node_c2) {\color{text_trngl}{c$^2$}};
+        
+    \end{tikzpicture}
+
+    \caption{Visual representation of the famous Pythagorean theorem.}
+    \label{fig:fig1}
+\end{figure}

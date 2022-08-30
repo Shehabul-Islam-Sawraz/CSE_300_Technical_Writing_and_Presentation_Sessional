@@ -1,0 +1,288 @@
+\documentclass{beamer}
+\usepackage{subfiles}
+\usepackage{tikz}
+\usepackage{color}
+\usepackage[]{algorithm2e}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+
+% There are many different themes available for Beamer. A comprehensive
+% list with examples is given here:
+% http://deic.uab.es/~iblanes/beamer_gallery/index_by_theme.html
+% You can uncomment the themes below if you would like to use a different
+% one:
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+%\usetheme{Boadilla}
+%\usetheme{boxes}
+%\usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{default}
+%\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+\title{Longest Common Subsequence(LCS)}
+
+\author{Tanveer Muttaqueen \and Subangkar Karmaker Shanto}
+
+\institute[Universities of Somewhere and Elsewhere] % (optional, but mostly needed)
+{
+Department of Computer Science \& Engineering\\
+Bangladesh University of Engineering and Technology
+}
+
+\date{\today}
+
+\subject{Theoretical Computer Science}
+
+% Let's get started
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+\begin{frame}{Problem Statement}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> \textbf{Input:} Two strings $S$ and $T$. 
+    \onslide\item<2-> \textbf{Output:} Longest common subsequence of $S$ and $T$.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Subsequence}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> \textbf{Definition:} Given two
+sequences $X$ = $\langle$ $x_1$, $x_2$,...,$x_m$ $\rangle$ and $Z$  = $\langle$ $z_1$, $z_2$,...,$z_k$ $\rangle$, we say that $Z$ is a subsequence of $X$ if there is a strictly increasing sequence of $k$ indices $i_1$, $i_2$,...,$i_k$  $(1$ $\leq$ $i_1$ $<$ $i_2$ $<$ ... $<$ $i_k$ $\leq$ $m$) such that $Z$ = $\langle$ $x_{i_1}$, $x_{i_2}$,..., $x_{i_k}$ $\rangle$. 
+    \onslide\item<2-> \textbf{Example:} Suppose $X$ = $\langle$LIFESUCKS$\rangle$. Then $\langle$LFS$\rangle$, $\langle$ISUCKS$\rangle$, $\langle$FES$\rangle$ etc. can be  subsequences of $X$. But $\langle$FIC$\rangle$, $\langle$ARA$\rangle$, $\langle$ERS$\rangle$ etc. are not subsequences of $X$. 
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{An Example}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> \textbf{Input:} $S$ = $\langle$BDCB$\rangle$,  $T$ = $\langle$BACDB$\rangle$
+    \onslide\item<2-> \textbf{Common Subsequences:} $\langle$B$\rangle$, $\langle$BD$\rangle$, $\langle$BCB$\rangle$ etc.
+    \onslide\item<3-> \textbf{Longest Common Subsequence:} $\langle$BCB$\rangle$
+\end{enumerate}
+\end{frame}
+
+
+
+\begin{frame}{Another Example}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> \textbf{Input:} $S$ = $\langle$DABKC$\rangle$,  $T$ = $\langle$APBCK$\rangle$
+    \onslide\item<2-> \textbf{Common Subsequences:} $\langle$A$\rangle$, $\langle$AB$\rangle$, $\langle$ABK$\rangle$, $\langle$ABC$\rangle$ etc.
+    \onslide\item<3-> \textbf{Longest Common Subsequence:} $\langle$ABK$\rangle$, $\langle$ABC$\rangle$
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Longest Common Subsequence Problem}
+\begin{block}{Back to the Problem}
+How do we find the longest common subsequence of two strings?
+\end{block}
+\end{frame}
+
+\begin{frame}{Brute Force Algorithm}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> Enumerate all subsequences of $S$, and check if they are subsequences of $T$.
+    %\onslide\item<2-> Common Subsequence:
+    % \onslide\item<3-> Longest Common Subsequence:
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Brute Force Algorithm Complexity}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> Suppose $S$ has length $n$ and $T$ has length $m$.
+    \onslide\item<2-> Then there are $2^n$ subsequences of $S$. Checking each of them if they are subsequence of $T$ can be done greedily in $O(m)$. 
+    \onslide\item<3-> So overall complexity is $O(m\cdot2^n)$.
+    \onslide\item<4-> Unfortunately even the fastest computer today can't complete calculations in thousands of years if $n$, $m$ $\geq$ 100. So we need faster algorithm. Dynamic programming in the rescue!
+\end{enumerate}
+\end{frame}
+
+
+
+\begin{frame}{A Far Better Approach}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> Notice that there is a optimal substructure. \\
+    Suppose $S$ = $\langle$$s_1$$s_2$..$s_n$$\rangle$, $T$ = $\langle$$t_1$$t_2$...$t_m$$\rangle$ and $Z$ = $\langle$$z_1$$z_2$...$z_k$$\rangle$ is their longest commmon subsequence.
+    \begin{enumerate}
+        \onslide\item<1-> If $s_n$ = $t_m$ then $z_k$ = $s_n$ = $t_m$. So $Z_{k-1}$ is an LCS of $S_{n-1}$ and $T_{m-1}$.
+        \onslide\item<2-> If $s_n$ $\neq$ $t_m$ and $z_k$ $\neq$ $s_n$ then $Z_k$ is an LCS of $S_{n-1}$ and $T_m$.
+        \onslide\item<3-> If $s_n$ $\neq$ $t_m$ and $z_k$ $\neq$ $t_m$ then $Z_k$ is an LCS of $S_{n}$ and $T_{m-1}$.
+        % \onslide\item<3-> Longest Common Subsequence:
+    \end{enumerate}
+    \onslide\item<4-> So the recursion will be: \\
+    \[ dp[i,j] =  \begin{cases} 
+      0 &  \text{if $i=0$ or $j=0$}   \\
+      dp[i-1, j-1] & \text{if $i,j > 0$ and $s_i$ = $t_j$ } \\
+      max(dp[i-1, j], dp[i, j-1]) & \text{if $i,j > 0$ and $s_i$  $\neq$ $t_j$ } 
+   \end{cases} \]
+   Here $dp[i,j]$ is the LCS of $S$ and $T$ till $i'th$ and $j'th$ index.
+   
+\end{enumerate}
+\end{frame}
+
+
+
+\begin{frame}{An Example Using Dynamic Programming Algorithm}
+\setbeamercovered{dynamic}
+% \caption{"ABCD"}
+% \begin{enumerate}
+%     \onslide\item<1-> s = ADAPT t=DBPT
+%     % \onslide\item<2-> 
+%     % \onslide\item<3-> Longest Common Subsequence:
+% \end{enumerate}
+% \bottom X = ADAPT Y = DBPT
+\begin{enumerate}
+    \onslide \item<1-> Suppose S = $\langle$ADAPT$\rangle$, T = $\langle$DBPT$\rangle$.
+    \onslide \item<2-> Then the DP table will according to the recursion (1-based indexing)\\
+    \centering
+    $
+    \begin{array}{ | l | l | l | l | l | l | l | }
+    \hline
+	    & j & 0 & 1 & 2 & 3 & 4 \\ \hline
+	    i &  & y & D & B & P & T \\ \hline
+	    0 & x & 0 & 0 & 0 & 0 & 0 \\ \hline
+	    1 & A & 0 & 0 & 0 & 0 & 0 \\ \hline
+	    2 & D & 0 & 1 & 1 & 1 & 1 \\ \hline
+	    3 & A & 0 & 1 & 1 & 1 & 1 \\ \hline
+	    4 & P & 0 & 1 & 1 & 2 & 2 \\ \hline
+	    5 & T & 0 & 1 & 1 & 2 & 3 \\ \hline
+    \end{array}
+    $
+\end{enumerate}
+
+\end{frame}
+
+
+
+\subfile{ConstructionTable.tex}
+
+\begin{frame}{Construction of Solution}
+ \setbeamercovered{dynamic}
+ \begin{enumerate}
+     \onslide\item<1-> Start from $dp[n,m]$ 
+     \onslide\item<2-> From each cell go to the direction in that cell.
+     \onslide\item<3-> In our path from $dp[i,j]$ compare $S[i]$ and $T[j]$. If $S[i]$ = $T[j]$ include this character in our LCS. \onslide\item<4-> Stop when reached in $dp[0,0]$. Now we have our LCS in reverse order. 
+  \end{enumerate}
+ \end{frame}
+
+
+\subfile{SolnConstruction.tex}
+
+\begin{frame}{Complexity}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> Each entity of the dp table can be computed in $O(1)$.
+    \onslide\item<2-> There are $|S|\cdot|T|$ entities to be filled. So total time complexity is $O( |S|\cdot |T| )$.
+    \onslide\item<3-> Similarly total memory complexity is also $O( |S|\cdot |T| )$.
+    % \onslide\item<2-> Common Subsequence:
+    % \onslide\item<3-> Longest Common Subsequence:
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Longest Common Subsequence Problem}
+\begin{block}{Further Optimization}
+Can we do better?
+\end{block}
+\end{frame}
+
+\begin{frame}{Further Optimization}
+\setbeamercovered{dynamic}
+\begin{enumerate}
+    \onslide\item<1-> Unfortunately, unless something is said explicitly about input alphabet, no known optimization on time complexity is possible. Some optimizatios,
+    \begin{enumerate}
+        \onslide\item<2->For problems with a bounded alphabet size, the Method of Four Russians can be used to reduce the running time of the dynamic programming algorithm by a logarithmic factor.
+        \onslide\item<3->For problems where $S$ and $T$ has no repeated alphabet, Longest common subsequence problem can be reduced to Longest increasing subsequence. Thus solving the problem in $O(n\cdot logn)$.
+
+    \end{enumerate}
+    \onslide\item<4-> But memory optimization is certainly possible. In each dp state we only need last two rows. So we can keep last two rows using even, odd sequence. Thus giving memory complexity $O(2\cdot|T|)$ 
+    % \onslide\item<3-> Longest Common Subsequence:
+\end{enumerate}
+\end{frame}
+
+% \begin{frame}{Reconstructing the Longest Common Subsequence}
+% \setbeamercovered{dynamic}
+% % \begin{enumerate}
+% %     \onslide\item<1-> s: t:
+% %     % \onslide\item<2-> Common Subsequence:
+% %     % \onslide\item<3-> Longest Common Subsequence:
+% % \end{enumerate}
+% \end{frame}
+
+
+
+
+\begin{frame}{Summary}
+  \begin{itemize}
+  \item
+    Longest common subsequence is a well known problem that can be solve using \alert{dynamic programming approach.}
+  \item
+    Dymanic programming solution has time complexity \alert{$O(|S|\cdot |T|)$.}
+  \item
+    Dymanic programming solution can further be \alert{optimized using constraints on input alphabet.}
+  \end{itemize}
+\end{frame}
+
+
+
+% All of the following is optional and typically not needed. 
+\appendix
+\section<presentation>*{\appendixname}
+\subsection<presentation>*{For Further Reading}
+
+\begin{frame}[allowframebreaks]
+  \frametitle<presentation>{For Further Reading}
+    
+  \begin{thebibliography}{10}
+    
+  \beamertemplatebookbibitems
+
+  \bibitem{Author1990}
+    Thomas H. Cormen, C.E. Leiserson, R. L. Rivest, and C. Stein.
+    \newblock {\em Introduction to Algorithms}.
+    \newblock The MIT Press, 1989.
+ 
+    
+  \beamertemplatearticlebibitems
+  % Followed by interesting articles. Keep the list short. 
+
+  \bibitem{Someone2000}
+    Masek, William J., Paterson, Michael S.
+    \newblock A faster algorithm computing string edit distances
+    \newblock {\em Journal of Computer and System Sciences}, , 20 (1): 18–31,1980.
+  \end{thebibliography}
+\end{frame}
+
+\end{document}
+
+
